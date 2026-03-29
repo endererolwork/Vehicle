@@ -1,7 +1,7 @@
 ﻿#include "ArmoredVehicle.h"
 
 #include "Components/BoxComponent.h"
-#include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -17,18 +17,28 @@ AArmoredVehicle::AArmoredVehicle()
     bReplicates = true;
     SetReplicatingMovement(true);
 
-    // Collision root
+    // Root collision
     CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
     SetRootComponent(CollisionBox);
     CollisionBox->SetBoxExtent(FVector(200.f, 100.f, 60.f));
     CollisionBox->SetSimulatePhysics(true);
-    CollisionBox->SetCollisionProfileName(TEXT("Vehicle"));
+    CollisionBox->SetCollisionProfileName(TEXT("BlockAll"));
 
-    // Mesh
-    VehicleMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("VehicleMesh"));
-    VehicleMesh->SetupAttachment(CollisionBox);
+    // Gövde mesh
+    BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
+    BodyMesh->SetupAttachment(CollisionBox);
 
-    // Third person camera
+    // Kule — gövdeye bağlı
+    TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
+    TurretMesh->SetupAttachment(BodyMesh);
+    TurretMesh->SetRelativeLocation(FVector(0.f, 0.f, 60.f));
+
+    // Namlu — kuleye bağlı
+    BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
+    BarrelMesh->SetupAttachment(TurretMesh);
+    BarrelMesh->SetRelativeLocation(FVector(200.f, 0.f, 0.f));
+
+    // Kamera
     SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
     SpringArm->SetupAttachment(CollisionBox);
     SpringArm->TargetArmLength = 600.f;
@@ -39,16 +49,16 @@ AArmoredVehicle::AArmoredVehicle()
     ThirdPersonCamera->SetupAttachment(SpringArm);
     ThirdPersonCamera->SetActive(true);
 
-    // Sight camera
     SightCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SightCamera"));
-    SightCamera->SetupAttachment(VehicleMesh, TEXT("SightSocket"));
+    SightCamera->SetupAttachment(BarrelMesh);
+    SightCamera->SetRelativeLocation(FVector(100.f, 0.f, 0.f));
     SightCamera->SetActive(false);
 
-    // Logic components — SRP
-    PhysicsComponent  = CreateDefaultSubobject<UVehiclePhysicsComponent>(TEXT("PhysicsComponent"));
-    TurretComponent   = CreateDefaultSubobject<UTurretComponent>(TEXT("TurretComponent"));
-    WeaponComponent   = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
-    RoleComponent     = CreateDefaultSubobject<URoleComponent>(TEXT("RoleComponent"));
+    // Logic components
+    PhysicsComponent = CreateDefaultSubobject<UVehiclePhysicsComponent>(TEXT("PhysicsComponent"));
+    TurretComponent  = CreateDefaultSubobject<UTurretComponent>(TEXT("TurretComponent"));
+    WeaponComponent  = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
+    RoleComponent    = CreateDefaultSubobject<URoleComponent>(TEXT("RoleComponent"));
 }
 
 void AArmoredVehicle::BeginPlay()

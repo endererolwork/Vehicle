@@ -1,5 +1,6 @@
 ﻿#include "TurretComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/StaticMeshComponent.h"
 
 UTurretComponent::UTurretComponent()
 {

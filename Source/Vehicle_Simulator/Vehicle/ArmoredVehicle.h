@@ -15,7 +15,7 @@ class UVehiclePhysicsComponent;
 class UTurretComponent;
 class UWeaponComponent;
 class URoleComponent;
-class USkeletalMeshComponent;
+class UStaticMeshComponent;
 class UBoxComponent;
 class USpringArmComponent;
 class UCameraComponent;
@@ -82,9 +82,17 @@ protected:
 
 private:
     // Components — SRP: her biri tek sorumlu
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",
-              meta = (AllowPrivateAccess = "true"))
-    TObjectPtr<USkeletalMeshComponent> VehicleMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh",
+		  meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> BodyMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh",
+			  meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> TurretMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh",
+			  meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> BarrelMesh;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components",
               meta = (AllowPrivateAccess = "true"))

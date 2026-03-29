@@ -43,8 +43,8 @@ private:
     float BarrelPitchMax = 20.f;
 
     UPROPERTY()
-    TObjectPtr<USceneComponent> TurretMesh;
+    TObjectPtr<UStaticMeshComponent> TurretMesh;
 
     UPROPERTY()
-    TObjectPtr<USceneComponent> BarrelMesh;
+    TObjectPtr<UStaticMeshComponent> BarrelMesh;
 };
