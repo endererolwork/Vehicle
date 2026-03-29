@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# Vehicle Simulator - Zırhlı Araç Simülasyonu
 
 Unreal Engine 5.3 üzerinde C++ ile geliştirilmiştir.
@@ -6,3 +7,6 @@ Unreal Engine 5.3 üzerinde C++ ile geliştirilmiştir.
 
 Bu proje, gerçekçi fizik, araç kontrolü, silah sistemi ve multiplayer desteği ile çalışan bir zırhlı araç simülasyonudur. Tüm mekanikler C++ ile yazılmış olup, SOLID prensipleri ve tasarım desenleri kullanılmıştır.
 
+=======
+# Vehicle
+>>>>>>> parent of c83c4af (Main Push)
