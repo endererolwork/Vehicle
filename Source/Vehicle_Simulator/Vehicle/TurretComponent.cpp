@@ -19,6 +19,25 @@ void UTurretComponent::GetLifetimeReplicatedProps(
     DOREPLIFETIME(UTurretComponent, TurretRotation);
 }
 
+void UTurretComponent::Initialize(
+    UStaticMeshComponent* InTurretMesh, UStaticMeshComponent* InBarrelMesh)
+{
+    TurretMesh = InTurretMesh;
+    BarrelMesh = InBarrelMesh;
+}
+
+void UTurretComponent::ApplyMeshRotation()
+{
+    if (TurretMesh)
+    {
+        TurretMesh->SetRelativeRotation(FRotator(0.f, TurretRotation.Yaw, 0.f));
+    }
+    if (BarrelMesh)
+    {
+        BarrelMesh->SetRelativeRotation(FRotator(TurretRotation.Pitch, 0.f, 0.f));
+    }
+}
+
 void UTurretComponent::RotateTurret(
     float YawInput, float PitchInput, float DeltaTime)
 {
@@ -28,12 +47,17 @@ void UTurretComponent::RotateTurret(
         NewRotation.Pitch + PitchInput * TurretRotationSpeed * DeltaTime,
         BarrelPitchMin, BarrelPitchMax);
 
+    // Client-side prediction: hemen uygula, sunucuya gönder
+    TurretRotation = NewRotation;
+    ApplyMeshRotation();
+
     Server_RotateTurret(NewRotation);
 }
 
 void UTurretComponent::Server_RotateTurret_Implementation(FRotator NewRotation)
 {
     TurretRotation = NewRotation;
+    ApplyMeshRotation(); // sunucu tarafında mesh güncelle
 }
 
 bool UTurretComponent::Server_RotateTurret_Validate(FRotator NewRotation)
@@ -43,14 +67,5 @@ bool UTurretComponent::Server_RotateTurret_Validate(FRotator NewRotation)
 
 void UTurretComponent::OnRep_TurretRotation()
 {
-    if (TurretMesh)
-    {
-        TurretMesh->SetRelativeRotation(
-            FRotator(0.f, TurretRotation.Yaw, 0.f));
-    }
-    if (BarrelMesh)
-    {
-        BarrelMesh->SetRelativeRotation(
-            FRotator(TurretRotation.Pitch, 0.f, 0.f));
-    }
+    ApplyMeshRotation();
 }

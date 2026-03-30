@@ -64,6 +64,12 @@ AArmoredVehicle::AArmoredVehicle()
 void AArmoredVehicle::BeginPlay()
 {
     Super::BeginPlay();
+
+    // TurretComponent'a mesh referanslarını ilet
+    if (TurretComponent)
+    {
+        TurretComponent->Initialize(TurretMesh, BarrelMesh);
+    }
 }
 
 void AArmoredVehicle::Tick(float DeltaTime)
@@ -163,6 +169,33 @@ void AArmoredVehicle::Server_SwitchRole_Implementation(EVehicleRole NewRole)
 bool AArmoredVehicle::Server_SwitchRole_Validate(EVehicleRole NewRole)
 {
     return true;
+}
+
+void AArmoredVehicle::ToggleCamera()
+{
+    if (!ThirdPersonCamera || !SightCamera) return;
+
+    const bool bSightWasActive = SightCamera->IsActive();
+    ThirdPersonCamera->SetActive(bSightWasActive);
+    SightCamera->SetActive(!bSightWasActive);
+}
+
+FVector AArmoredVehicle::GetMuzzleLocation() const
+{
+    if (BarrelMesh)
+    {
+        return BarrelMesh->GetComponentLocation();
+    }
+    return GetActorLocation() + FVector(0.f, 0.f, 60.f);
+}
+
+FVector AArmoredVehicle::GetMuzzleForwardVector() const
+{
+    if (BarrelMesh)
+    {
+        return BarrelMesh->GetForwardVector();
+    }
+    return GetActorForwardVector();
 }
 
 // OnRep callbacks

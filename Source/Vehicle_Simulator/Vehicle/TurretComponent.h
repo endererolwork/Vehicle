@@ -18,12 +18,16 @@ public:
     UFUNCTION(BlueprintPure, Category = "Turret")
     FRotator GetTurretRotation() const { return TurretRotation; }
 
+    void Initialize(UStaticMeshComponent* InTurretMesh, UStaticMeshComponent* InBarrelMesh);
+
 protected:
     virtual void BeginPlay() override;
     virtual void GetLifetimeReplicatedProps(
         TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+    void ApplyMeshRotation();
+
     UFUNCTION(Server, Reliable, WithValidation)
     void Server_RotateTurret(FRotator NewRotation);
 

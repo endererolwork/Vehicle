@@ -60,6 +60,17 @@ public:
     UFUNCTION(BlueprintPure, Category = "Vehicle")
     UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 
+    // Kamera geçişi (sadece yerel client)
+    UFUNCTION(BlueprintCallable, Category = "Vehicle|Camera")
+    void ToggleCamera();
+
+    // Namlu uç pozisyonu ve yönü (ateş için)
+    UFUNCTION(BlueprintPure, Category = "Vehicle|Weapon")
+    FVector GetMuzzleLocation() const;
+
+    UFUNCTION(BlueprintPure, Category = "Vehicle|Weapon")
+    FVector GetMuzzleForwardVector() const;
+
 protected:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaTime) override;

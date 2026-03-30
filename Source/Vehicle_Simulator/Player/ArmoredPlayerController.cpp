@@ -167,10 +167,9 @@ void AArmoredPlayerController::OnFire(const FInputActionValue& Value)
 	UWeaponComponent* Weapon = ControlledVehicle->GetWeaponComponent();
 	if (Weapon)
 	{
-		// Get fire origin and direction from barrel/turret
 		FFireParams Params;
-		Params.Origin = ControlledVehicle->GetActorLocation() + FVector(0, 0, 100);
-		Params.Direction = ControlledVehicle->GetActorForwardVector();
+		Params.Origin    = ControlledVehicle->GetMuzzleLocation();
+		Params.Direction = ControlledVehicle->GetMuzzleForwardVector();
 		Params.MuzzleSpeed = 2000.0f;
 
 		Weapon->RequestFire(Params);
@@ -192,6 +191,8 @@ void AArmoredPlayerController::OnSwitchRole(const FInputActionValue& Value)
 
 void AArmoredPlayerController::OnSwitchCamera(const FInputActionValue& Value)
 {
-	// Toggle between third person and sight camera
-	// This will be implemented with camera components
+	if (ControlledVehicle)
+	{
+		ControlledVehicle->ToggleCamera();
+	}
 }
