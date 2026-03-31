@@ -30,6 +30,10 @@ public:
 protected:
     virtual void BeginPlay() override;
 
+    // Blueprint'te hangi silah kullanılacağını belirler (ör. BP_Cannon)
+    UPROPERTY(EditAnywhere, Category = "Weapon")
+    TSubclassOf<UObject> DefaultWeaponClass;
+
 private:
     UFUNCTION(Server, Reliable, WithValidation)
     void Server_Fire(const FFireParams& Params);

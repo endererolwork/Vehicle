@@ -71,8 +71,11 @@ private:
 
 	// Input callbacks - Driver
 	void OnThrottle(const struct FInputActionValue& Value);
+	void OnThrottleReleased(const struct FInputActionValue& Value);
 	void OnSteering(const struct FInputActionValue& Value);
+	void OnSteeringReleased(const struct FInputActionValue& Value);
 	void OnBrake(const struct FInputActionValue& Value);
+	void OnBrakeReleased(const struct FInputActionValue& Value);
 
 	// Input callbacks - Gunner
 	void OnRotateTurret(const struct FInputActionValue& Value);

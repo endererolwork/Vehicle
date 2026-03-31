@@ -39,7 +39,7 @@ struct FVehiclePhysicsConfig
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
-	float MaxTorque = 800000.f;
+	float MaxTorque = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
 	float MaxBrakingForce = 500000.f;

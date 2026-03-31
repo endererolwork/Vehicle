@@ -36,8 +36,9 @@ void UVehiclePhysicsComponent::ApplyThrottle(float DeltaTime)
 {
     if (FMath::IsNearlyZero(CurrentInput.Throttle)) return;
 
+    // bAccelChange=true: physics engine integrates with its own dt, don't multiply DeltaTime here
     const FVector ForwardForce = GetOwner()->GetActorForwardVector()
-        * Config.MaxTorque * CurrentInput.Throttle * DeltaTime;
+        * Config.MaxTorque * CurrentInput.Throttle;
 
     RootPhysics->AddForce(ForwardForce, NAME_None, true);
 }
@@ -46,9 +47,12 @@ void UVehiclePhysicsComponent::ApplySteering(float DeltaTime)
 {
     if (FMath::IsNearlyZero(CurrentInput.Steering)) return;
 
-    const FVector TorqueVector = FVector(0.f, 0.f,
-        Config.MaxTorque * 0.1f * CurrentInput.Steering * DeltaTime);
+    // Only steer when moving — prevents spinning in place
+    const float Speed = RootPhysics->GetPhysicsLinearVelocity().Size();
+    if (Speed < 50.f) return;
 
+    // 200 deg/s² angular accel — with AngularDamping=8, terminal rate ≈ 25 deg/s (full turn ~14s)
+    const FVector TorqueVector = FVector(0.f, 0.f, 200.f * CurrentInput.Steering);
     RootPhysics->AddTorqueInDegrees(TorqueVector, NAME_None, true);
 }
 

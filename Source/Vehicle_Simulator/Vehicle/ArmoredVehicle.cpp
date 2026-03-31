@@ -23,6 +23,8 @@ AArmoredVehicle::AArmoredVehicle()
     CollisionBox->SetBoxExtent(FVector(200.f, 100.f, 60.f));
     CollisionBox->SetSimulatePhysics(true);
     CollisionBox->SetCollisionProfileName(TEXT("BlockAll"));
+    CollisionBox->SetLinearDamping(0.5f);
+    CollisionBox->SetAngularDamping(8.0f);
 
     // Gövde mesh
     BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));

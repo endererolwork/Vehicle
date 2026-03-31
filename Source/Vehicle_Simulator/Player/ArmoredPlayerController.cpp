@@ -39,11 +39,20 @@ void AArmoredPlayerController::SetupInputComponent()
 
 	// Driver inputs
 	if (IA_Throttle)
-		EnhancedInput->BindAction(IA_Throttle, ETriggerEvent::Triggered, this, &AArmoredPlayerController::OnThrottle);
+	{
+		EnhancedInput->BindAction(IA_Throttle, ETriggerEvent::Triggered,  this, &AArmoredPlayerController::OnThrottle);
+		EnhancedInput->BindAction(IA_Throttle, ETriggerEvent::Completed,  this, &AArmoredPlayerController::OnThrottleReleased);
+	}
 	if (IA_Steering)
-		EnhancedInput->BindAction(IA_Steering, ETriggerEvent::Triggered, this, &AArmoredPlayerController::OnSteering);
+	{
+		EnhancedInput->BindAction(IA_Steering, ETriggerEvent::Triggered,  this, &AArmoredPlayerController::OnSteering);
+		EnhancedInput->BindAction(IA_Steering, ETriggerEvent::Completed,  this, &AArmoredPlayerController::OnSteeringReleased);
+	}
 	if (IA_Brake)
-		EnhancedInput->BindAction(IA_Brake, ETriggerEvent::Triggered, this, &AArmoredPlayerController::OnBrake);
+	{
+		EnhancedInput->BindAction(IA_Brake, ETriggerEvent::Triggered,  this, &AArmoredPlayerController::OnBrake);
+		EnhancedInput->BindAction(IA_Brake, ETriggerEvent::Completed,  this, &AArmoredPlayerController::OnBrakeReleased);
+	}
 
 	// Gunner inputs
 	if (IA_RotateTurret)
@@ -143,6 +152,27 @@ void AArmoredPlayerController::OnBrake(const FInputActionValue& Value)
 
 	bCurrentBrake = Value.Get<bool>();
 	ControlledVehicle->SetInput_Implementation(CurrentThrottle, CurrentSteering, bCurrentBrake);
+}
+
+void AArmoredPlayerController::OnThrottleReleased(const FInputActionValue& Value)
+{
+	CurrentThrottle = 0.f;
+	if (ControlledVehicle)
+		ControlledVehicle->SetInput_Implementation(0.f, CurrentSteering, bCurrentBrake);
+}
+
+void AArmoredPlayerController::OnSteeringReleased(const FInputActionValue& Value)
+{
+	CurrentSteering = 0.f;
+	if (ControlledVehicle)
+		ControlledVehicle->SetInput_Implementation(CurrentThrottle, 0.f, bCurrentBrake);
+}
+
+void AArmoredPlayerController::OnBrakeReleased(const FInputActionValue& Value)
+{
+	bCurrentBrake = false;
+	if (ControlledVehicle)
+		ControlledVehicle->SetInput_Implementation(CurrentThrottle, CurrentSteering, false);
 }
 
 // Gunner callbacks

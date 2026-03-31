@@ -14,8 +14,11 @@ void UWeaponComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    // Default weapon: Cannon (can be changed via Blueprint or code)
-    SetActiveWeaponByClass(UCannon::StaticClass());
+    // Blueprint'te DefaultWeaponClass set edildiyse onu, yoksa Cannon fallback
+    TSubclassOf<UObject> WeaponToUse = DefaultWeaponClass
+        ? DefaultWeaponClass
+        : TSubclassOf<UObject>(UCannon::StaticClass());
+    SetActiveWeaponByClass(WeaponToUse);
 }
 
 void UWeaponComponent::SetActiveWeaponByClass(TSubclassOf<UObject> WeaponClass)
