@@ -29,6 +29,8 @@ AArmoredVehicle::AArmoredVehicle()
     // Gövde mesh
     BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BodyMesh"));
     BodyMesh->SetupAttachment(CollisionBox);
+    // Mesh'in görsel ilerisi Y eksenindeyse -90° döndürerek actor X (forward) ile hizala
+    BodyMesh->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 
     // Kule — gövdeye bağlı
     TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));

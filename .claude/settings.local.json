@@ -7,7 +7,10 @@
       "Bash(dotnet --list-sdks)",
       "Bash(dir:*)",
       "Bash(\"C:/Program Files/Epic Games/UE_5.3/Engine/Binaries/ThirdParty/DotNet/6.0.302/windows/dotnet.exe\" --version 2>&1)",
-      "Bash(cmd /c \"\"\"C:/Program Files/Epic Games/UE_5.3/Engine/Build/BatchFiles/Build.bat\"\" -projectfiles -project=\"\"C:/Users/ender/Documents/GitHub/Vehicle/Vehicle_Simulator.uproject\"\" -game -rocket -progress > \"\"C:/Users/ender/Documents/GitHub/Vehicle/build_output.txt\"\" 2>&1\")"
+      "Bash(cmd /c \"\"\"C:/Program Files/Epic Games/UE_5.3/Engine/Build/BatchFiles/Build.bat\"\" -projectfiles -project=\"\"C:/Users/ender/Documents/GitHub/Vehicle/Vehicle_Simulator.uproject\"\" -game -rocket -progress > \"\"C:/Users/ender/Documents/GitHub/Vehicle/build_output.txt\"\" 2>&1\")",
+      "Bash(find /c/Users/PC/Documents/GitHub/Vehicle -type f -name *.js -o -name *.ts -o -name *.py -o -name *.cpp -o -name *.cs)",
+      "Bash(find /c/Users/PC/Documents/GitHub/Vehicle -type f -name *.uasset -o -name *Input*)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

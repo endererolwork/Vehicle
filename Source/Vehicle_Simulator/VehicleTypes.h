@@ -38,8 +38,13 @@ struct FVehiclePhysicsConfig
 {
 	GENERATED_BODY()
 
+	// İleri/geri kuvvet (bAccelChange=true, kütle bağımsız)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
-	float MaxTorque = 1000.f;
+	float MaxTorque = 500.f;
+
+	// Maksimum yaw hızı (deg/s) — A/D ile ulaşılan terminal dönüş hızı
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
+	float MaxYawRate = 60.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
 	float MaxBrakingForce = 500000.f;

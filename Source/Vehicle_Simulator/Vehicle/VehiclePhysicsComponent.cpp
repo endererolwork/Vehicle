@@ -27,6 +27,9 @@ void UVehiclePhysicsComponent::TickComponent(float DeltaTime,
 
     if (!RootPhysics || !GetOwner()->HasAuthority()) return;
 
+    SmoothedThrottle = FMath::FInterpTo(SmoothedThrottle, CurrentInput.Throttle, DeltaTime, 3.f);
+    SmoothedSteering = FMath::FInterpTo(SmoothedSteering, CurrentInput.Steering, DeltaTime, 3.f);
+
     ApplyThrottle(DeltaTime);
     ApplySteering(DeltaTime);
     ApplySuspension();
@@ -34,26 +37,29 @@ void UVehiclePhysicsComponent::TickComponent(float DeltaTime,
 
 void UVehiclePhysicsComponent::ApplyThrottle(float DeltaTime)
 {
-    if (FMath::IsNearlyZero(CurrentInput.Throttle)) return;
+    if (FMath::IsNearlyZero(SmoothedThrottle)) return;
 
-    // bAccelChange=true: physics engine integrates with its own dt, don't multiply DeltaTime here
     const FVector ForwardForce = GetOwner()->GetActorForwardVector()
-        * Config.MaxTorque * CurrentInput.Throttle;
+        * Config.MaxTorque * SmoothedThrottle;
 
     RootPhysics->AddForce(ForwardForce, NAME_None, true);
 }
 
 void UVehiclePhysicsComponent::ApplySteering(float DeltaTime)
 {
-    if (FMath::IsNearlyZero(CurrentInput.Steering)) return;
+    // Physics angular velocity'yi sıfırla — fizik motorunun istem dışı döndürmesini önler
+    RootPhysics->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 
-    // Only steer when moving — prevents spinning in place
-    const float Speed = RootPhysics->GetPhysicsLinearVelocity().Size();
-    if (Speed < 50.f) return;
+    if (FMath::IsNearlyZero(SmoothedSteering)) return;
 
-    // 200 deg/s² angular accel — with AngularDamping=8, terminal rate ≈ 25 deg/s (full turn ~14s)
-    const FVector TorqueVector = FVector(0.f, 0.f, 200.f * CurrentInput.Steering);
-    RootPhysics->AddTorqueInDegrees(TorqueVector, NAME_None, true);
+    // Direkt rotation: A=-MaxYawRate deg/s, D=+MaxYawRate deg/s
+    const float YawDelta = Config.MaxYawRate * SmoothedSteering * DeltaTime;
+    GetOwner()->AddActorLocalRotation(
+        FRotator(0.f, YawDelta, 0.f),
+        false,
+        nullptr,
+        ETeleportType::TeleportPhysics
+    );
 }
 
 void UVehiclePhysicsComponent::ApplySuspension()
