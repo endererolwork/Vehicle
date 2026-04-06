@@ -118,10 +118,13 @@ float AArmoredVehicle::GetHealth_Implementation() const
 void AArmoredVehicle::SetInput_Implementation(
     float Throttle, float Steering, bool bBrake)
 {
-    if (IsLocallyControlled())
-    {
+    // Doğrudan fizik bileşenine ilet — RPC gecikmesi olmadan çalışır
+    if (PhysicsComponent)
+        PhysicsComponent->SetInput_Implementation(Throttle, Steering, bBrake);
+
+    // Multiplayer: client ise server'a da gönder
+    if (IsLocallyControlled() && !HasAuthority())
         Server_SetInput(Throttle, Steering, bBrake);
-    }
 }
 
 // IRoleSwappable

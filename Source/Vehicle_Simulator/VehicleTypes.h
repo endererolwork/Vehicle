@@ -38,9 +38,21 @@ struct FVehiclePhysicsConfig
 {
 	GENERATED_BODY()
 
-	// İleri/geri kuvvet (bAccelChange=true, kütle bağımsız)
+	// Maksimum ileri hız (cm/s) — ~1500 ≈ 54 km/h
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
-	float MaxTorque = 500.f;
+	float MaxForwardSpeed = 1500.f;
+
+	// Maksimum geri hız (cm/s) — tanklar yavaş geri gider
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
+	float MaxReverseSpeed = 500.f;
+
+	// Hızlanma yumuşatma hızı (FInterpTo speed) — küçük = daha yavaş hızlanır
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
+	float AccelerationRate = 1.5f;
+
+	// Yavaşlama yumuşatma hızı (gaz bırakıldığında)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")
+	float DecelerationRate = 2.5f;
 
 	// Maksimum yaw hızı (deg/s) — A/D ile ulaşılan terminal dönüş hızı
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Physics")

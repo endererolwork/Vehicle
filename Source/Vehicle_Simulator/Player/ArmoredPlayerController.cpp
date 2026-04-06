@@ -1,4 +1,5 @@
 ﻿#include "ArmoredPlayerController.h"
+#include "Engine/Engine.h"
 #include "../Vehicle/ArmoredVehicle.h"
 #include "../Vehicle/TurretComponent.h"
 #include "../Weapon/WeaponComponent.h"
@@ -16,6 +17,9 @@ void AArmoredPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp, Warning, TEXT("ArmoredPlayerController BeginPlay — IsLocal: %s"),
+		IsLocalController() ? TEXT("YES") : TEXT("NO"));
+
 	// Default role: Driver
 	if (IsLocalController())
 	{
@@ -26,8 +30,9 @@ void AArmoredPlayerController::BeginPlay()
 void AArmoredPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
 	ControlledVehicle = Cast<AArmoredVehicle>(InPawn);
+	UE_LOG(LogTemp, Warning, TEXT("OnPossess — Vehicle: %s"),
+		ControlledVehicle ? TEXT("OK") : TEXT("NULL — possess failed!"));
 }
 
 void AArmoredPlayerController::SetupInputComponent()
@@ -132,6 +137,10 @@ void AArmoredPlayerController::ApplyInputMappingContext(EVehicleRole NewRole)
 // Driver callbacks
 void AArmoredPlayerController::OnThrottle(const FInputActionValue& Value)
 {
+	GEngine->AddOnScreenDebugMessage(1, 0.1f, FColor::Green,
+		FString::Printf(TEXT("OnThrottle: %.2f | Role=%d | Vehicle=%s"),
+			Value.Get<float>(), (int)CurrentRole, ControlledVehicle ? TEXT("OK") : TEXT("NULL")));
+
 	if (CurrentRole != EVehicleRole::Driver || !ControlledVehicle) return;
 
 	CurrentThrottle = Value.Get<float>();
@@ -140,6 +149,10 @@ void AArmoredPlayerController::OnThrottle(const FInputActionValue& Value)
 
 void AArmoredPlayerController::OnSteering(const FInputActionValue& Value)
 {
+	GEngine->AddOnScreenDebugMessage(2, 0.1f, FColor::Cyan,
+		FString::Printf(TEXT("OnSteering: %.2f | Role=%d | Vehicle=%s"),
+			Value.Get<float>(), (int)CurrentRole, ControlledVehicle ? TEXT("OK") : TEXT("NULL")));
+
 	if (CurrentRole != EVehicleRole::Driver || !ControlledVehicle) return;
 
 	CurrentSteering = Value.Get<float>();

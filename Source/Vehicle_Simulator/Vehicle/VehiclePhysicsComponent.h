@@ -34,8 +34,8 @@ private:
 
     FVehicleInput CurrentInput;
 
-    float SmoothedThrottle = 0.f;
     float SmoothedSteering = 0.f;
+    float CurrentSpeed = 0.f;
 
     UPROPERTY()
     TObjectPtr<UPrimitiveComponent> RootPhysics;

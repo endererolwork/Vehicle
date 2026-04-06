@@ -1,5 +1,6 @@
-﻿#include "VehiclePhysicsComponent.h"
+#include "VehiclePhysicsComponent.h"
 #include "GameFramework/Actor.h"
+#include "Engine/Engine.h"
 
 UVehiclePhysicsComponent::UVehiclePhysicsComponent()
 {
@@ -10,6 +11,8 @@ void UVehiclePhysicsComponent::BeginPlay()
 {
     Super::BeginPlay();
     RootPhysics = Cast<UPrimitiveComponent>(GetOwner()->GetRootComponent());
+    UE_LOG(LogTemp, Warning, TEXT("PhysicsComponent BeginPlay — RootPhysics: %s"),
+        RootPhysics ? TEXT("OK") : TEXT("NULL"));
 }
 
 void UVehiclePhysicsComponent::SetInput_Implementation(
@@ -25,34 +28,47 @@ void UVehiclePhysicsComponent::TickComponent(float DeltaTime,
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    if (!RootPhysics || !GetOwner()->HasAuthority()) return;
+    if (!RootPhysics) return;
 
-    SmoothedThrottle = FMath::FInterpTo(SmoothedThrottle, CurrentInput.Throttle, DeltaTime, 3.f);
-    SmoothedSteering = FMath::FInterpTo(SmoothedSteering, CurrentInput.Steering, DeltaTime, 3.f);
+    SmoothedSteering = FMath::FInterpTo(SmoothedSteering, CurrentInput.Steering, DeltaTime, 5.f);
+
+    GEngine->AddOnScreenDebugMessage(3, 0.1f, FColor::Yellow,
+        FString::Printf(TEXT("PhysicsTick | Throttle=%.2f Steering=%.2f | Speed=%.1f"),
+            CurrentInput.Throttle, CurrentInput.Steering, CurrentSpeed));
 
     ApplyThrottle(DeltaTime);
     ApplySteering(DeltaTime);
-    ApplySuspension();
 }
 
 void UVehiclePhysicsComponent::ApplyThrottle(float DeltaTime)
 {
-    if (FMath::IsNearlyZero(SmoothedThrottle)) return;
+    // W > 0 = ileri, S < 0 = geri, 0 = dur
+    float TargetSpeed = 0.f;
+    if (CurrentInput.Throttle > 0.f)
+        TargetSpeed = Config.MaxForwardSpeed;
+    else if (CurrentInput.Throttle < 0.f)
+        TargetSpeed = -Config.MaxReverseSpeed;
 
-    const FVector ForwardForce = GetOwner()->GetActorForwardVector()
-        * Config.MaxTorque * SmoothedThrottle;
+    const float Rate = FMath::IsNearlyZero(TargetSpeed) ? Config.DecelerationRate : Config.AccelerationRate;
+    CurrentSpeed = FMath::FInterpTo(CurrentSpeed, TargetSpeed, DeltaTime, Rate);
 
-    RootPhysics->AddForce(ForwardForce, NAME_None, true);
+    // Z hızını koru (yerçekimi çalışsın), sadece ileri/geri uygula
+    const FVector Forward     = GetOwner()->GetActorForwardVector();
+    const FVector CurrentVel  = RootPhysics->GetPhysicsLinearVelocity();
+    RootPhysics->SetPhysicsLinearVelocity(
+        FVector(Forward.X, Forward.Y, 0.f).GetSafeNormal() * CurrentSpeed
+        + FVector(0.f, 0.f, CurrentVel.Z)
+    );
 }
 
 void UVehiclePhysicsComponent::ApplySteering(float DeltaTime)
 {
-    // Physics angular velocity'yi sıfırla — fizik motorunun istem dışı döndürmesini önler
+    // Fizik motorunun istem dışı döndürmesini önle
     RootPhysics->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 
     if (FMath::IsNearlyZero(SmoothedSteering)) return;
 
-    // Direkt rotation: A=-MaxYawRate deg/s, D=+MaxYawRate deg/s
+    // A = -1 = sol, D = +1 = sağ
     const float YawDelta = Config.MaxYawRate * SmoothedSteering * DeltaTime;
     GetOwner()->AddActorLocalRotation(
         FRotator(0.f, YawDelta, 0.f),
@@ -60,9 +76,4 @@ void UVehiclePhysicsComponent::ApplySteering(float DeltaTime)
         nullptr,
         ETeleportType::TeleportPhysics
     );
-}
-
-void UVehiclePhysicsComponent::ApplySuspension()
-{
-    // Raycast tabanlı süspansiyon — sonraki adımda detaylanacak
 }
